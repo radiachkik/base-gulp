@@ -74,7 +74,7 @@ gulp.task('scripts', function() {
 // Styles task: Compile Sass, add prefixes and minify
 gulp.task('styles', function() {
 	gulp.src('css/**/*.scss')
-		.pipe(sass({ bundleExec: true, style: 'expanded', sourcemapPath: '.', compass: true }))
+		.pipe(sass({ bundleExec: true, style: 'expanded', compass: true }))
 		.pipe(autoprefix())
 		.pipe(gulp.dest('css/'))
 		.pipe(rename({ suffix: ".min" }))
@@ -87,33 +87,6 @@ gulp.task('styles', function() {
 			return 'Styles: ' + file.relative + ' generated.';
 		}));
 });
-
-/*
- * COMING SOON to a Terminal near you
- * Imagemin seems to have bugs - runs fine on its own but doesn't work if you try and "use" additional plugins
- * You can use the plugins directly, as I have below, but then it doesn't inform you of how many files were optimised and the amount of savings
- */
-// Image optimisation task: optimises jpegs and pngs
-/*gulp.task('optimise-images', function () {
-	gulp.src('img/src/*')
-		// .pipe(changed('img/'))
-		.pipe(imagemin({
-			progressive: true,
-			optimizationLevel: 5,
-			// use: [pngquant({ quality: '60-80' }), mozjpeg()]
-			// use: [pngquant({ quality: '60-80' })]
-			// use: [mozjpeg()]
-			// use: [pngquant()]
-			// use: [pngquant(), mozjpeg()]
-		}))
-		.pipe(gulp.dest('img/'));
-	gulp.src('img/src/*.jpg')
-		.pipe(mozjpeg())
-		.pipe(gulp.dest('img/'));
-	gulp.src('img/src/*.png')
-		.pipe(pngquant({ quality: '60-80' }))
-		.pipe(gulp.dest('img/'));
-});*/
 
 // Configure and start BrowserSync
 gulp.task('browser-sync', function() {
