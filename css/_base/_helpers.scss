@@ -1,0 +1,18 @@
+/* ==========================================================================
+   Helpers
+   ========================================================================== */
+
+/*
+ * Variables
+ */
+
+/*
+ * Functions
+ */
+@function convert($target, $unit: em, $context: 16) {
+	@if $unit == "em" {
+		@return ($target / $context) * 1em;
+	} @else if $unit == "%" {
+		@return percentage($target / $context);
+	}
+}
