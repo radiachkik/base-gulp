@@ -22,7 +22,7 @@ Gulp has been configured to do the following:
 - Minify JS
 - Run JSHint
 - Add a banner to the top of the files with the author, version and build date
-- Compress images (currently disabled)
+- Compress images
 - Live updates with BrowserSync
 - Notifications on task completion
 
