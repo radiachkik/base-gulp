@@ -24,10 +24,10 @@ dateFormat = require('dateformat'),
 now        = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss Z"),
 banner     = '/*!\n'+
 			 ' * <%= pkg.name %>\n'+
-			 ' * Author: <%= pkg.author %>\n'+
-			 ' * Version: <%= pkg.version %>\n'+
+			 ' * @author <%= pkg.author %>\n'+
+			 ' * @version <%= pkg.version %>\n'+
 			 ' * Build date: '+ now +'\n'+
-			 ' */\n\n';
+			 ' */\n';
 
 // JS hint task: Runs JSHint using the options in the .jshintrc file
 gulp.task('jshint', function() {
@@ -74,24 +74,41 @@ gulp.task('scripts', function() {
 // Styles task: Compile Sass, add prefixes and minify
 gulp.task('styles', function() {
 	gulp.src('css/**/*.scss')
-		.pipe(sass({ bundleExec: true, style: 'expanded', compass: true }))
+		.pipe(sass({ bundleExec: true, style: 'expanded', sourcemap: true, sourcemapPath: './'/*, compass: true*/ }))
 		.pipe(autoprefix())
+		.pipe(header(banner, { pkg : pkg } ))
 		.pipe(gulp.dest('css/'))
+		.pipe(filter('*.css')) // Filter stream so we only get notifications and injections from CSS files, not the maps & so we don't minify the map file
 		.pipe(rename({ suffix: ".min" }))
-		.pipe(minifycss())
+		.pipe(minifycss({ keepSpecialComments: 0 }))
 		.pipe(header(banner, { pkg: pkg } ))
 		.pipe(gulp.dest('css/'))
-		.pipe(filter('*.css')) // Filter stream so we only get notifications and injections from CSS files, not the maps
 		.pipe(reload({ stream: true }))
 		.pipe(notify(function (file) {
 			return 'Styles: ' + file.relative + ' generated.';
 		}));
 });
 
+// Image optimisation task: optimises jpegs and pngs
+gulp.task('optimise-images', function () {
+	gulp.src('img/src/**/*')
+		.pipe(changed('img/'))
+		.pipe(imagemin({
+			progressive: true,
+			optimizationLevel: 5,
+			use: [pngquant({ quality: '60-80' }), mozjpeg()]
+		}))
+		.pipe(gulp.dest('img/build/'))
+		.pipe(notify({
+			onLast: true,
+			message: 'Images optimised. See Terminal for savings.'
+		}));
+});
+
 // Configure and start BrowserSync
 gulp.task('browser-sync', function() {
 	browserSync({
-		proxy: "local.domainame.tld"
+		proxy: "local.domain.com"
 	});
 });
 

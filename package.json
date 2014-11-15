@@ -1,8 +1,13 @@
 {
   "name": "Gulp",
-  "version": "0.1.0",
-  "description": "Standard gulp setup",
-  "author": "Williamium",
+  "version": "1.1.0",
+  "description": "Testing Gulp and Bundler",
+  "author": "William Walker <william@williamwalker.me> (http://williamwalker.me/)",
+  "homepage": "https://bitbucket.org/williamium/gulp/overview",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://williamium@bitbucket.org/williamium/gulp.git"
+  },
   "devDependencies": {
     "gulp": "~3.8.x",
     "gulp-notify": "~2.0.x",
@@ -15,13 +20,13 @@
     "gulp-uglify": "~1.0.x",
     "gulp-jshint": "~1.8.x",
     "gulp-sourcemaps": "~1.2.x",
-    "gulp-imagemin": "~1.1.x",
+    "gulp-imagemin": "~2.0.x",
     "gulp-changed": "~1.0.x",
     "gulp-filter": "~1.0.x",
     "dateformat": "~1.0.x",
     "browser-sync": "~1.5.x",
     "jshint-stylish": "~1.0.x",
-    "imagemin-mozjpeg": "~2.0.x",
-    "imagemin-pngquant": "~2.0.x",
+    "imagemin-mozjpeg": "~4.0.x",
+    "imagemin-pngquant": "~4.0.x"
   }
 }
