@@ -92,7 +92,7 @@ gulp.task('styles', function() {
 // Image optimisation task: optimises jpegs and pngs
 gulp.task('optimise-images', function () {
 	gulp.src('img/src/**/*')
-		.pipe(changed('img/'))
+		.pipe(changed('img/build/'))
 		.pipe(imagemin({
 			progressive: true,
 			optimizationLevel: 5,
