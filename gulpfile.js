@@ -144,11 +144,14 @@ gulp.task('optimise-images', function () {
 			optimizationLevel: 5,
 			use: [pngquant({ quality: '60-80' }), mozjpeg()]
 		}))
-		.pipe(gulp.dest('img/build/'))
-		.pipe(notify({
-			onLast: true,
-			message: 'Images optimised. See Terminal for savings.'
-		}));
+		.pipe(gulp.dest('img/build/'));
+});
+
+gulp.task('generate-webp-images', function () {
+	gulp.src('img/src/**/*.jpg') // We'll only use it for jpegs since we get better results using pngquant above for pngs
+		.pipe(changed('img/build/', { extension: '.webp' }))
+		.pipe(webp({ quality: 83 })) // I think default quality is 75 which is a bit too low (especially for use in some PNGs)
+		.pipe(gulp.dest('img/build/'));
 });
 
 // Configure and start BrowserSync
