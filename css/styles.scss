@@ -2,7 +2,8 @@
    Sass imports
    ========================================================================== */
 
-@import "_base/helpers";
+@import "_helpers/helpers";
+
 @import "_base/grid";
 @import "_base/normalize";
 @import "_base/animations";
