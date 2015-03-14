@@ -1,7 +1,7 @@
 {
   "name": "Gulp",
-  "version": "1.1.0",
-  "description": "Testing Gulp and Bundler",
+  "version": "2.0.0",
+  "description": "Gulp and Sass setup",
   "author": "William Walker <william@williamwalker.me> (http://williamwalker.me/)",
   "homepage": "https://bitbucket.org/williamium/gulp/overview",
   "repository" : {
