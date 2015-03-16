@@ -78,7 +78,7 @@ gulp.task('plugin-scripts', function() {
 gulp.task('styles', function() {
 	gulp.src('css/**/*.scss')
 		.pipe(sourcemaps.init())
-			.pipe(libsass({
+			.pipe(sass({
 				outputStyle: 'expanded',
 				errLogToConsole: false,
 				onError: function(err) {
