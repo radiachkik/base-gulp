@@ -124,7 +124,7 @@ gulp.task('styles', function() {
 		.pipe(sourcemaps.init())
 			.pipe(sass({ outputStyle: 'expanded' }))
 			.pipe(autoprefix())
-			.pipe(gulp.dest('style/'))
+			.pipe(gulp.dest('css/'))
 			.pipe(rename({ suffix: ".min" })) // Rename the generated CSS file to add the .min suffix
 			.pipe(cssnano())
 			.pipe(header(banner, { pkg: pkg } ))
