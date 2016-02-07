@@ -6,11 +6,12 @@ reload      = browserSync.reload,
 gulp        = require('gulp'),
 autoprefix  = require('gulp-autoprefixer'),
 concat      = require('gulp-concat'),
+cssnano     = require('gulp-cssnano'),
 filter      = require('gulp-filter'),
 header      = require('gulp-header'),
 jshint      = require('gulp-jshint'),
-minifycss   = require('gulp-minify-css'),
 notify      = require('gulp-notify'),
+plumber     = require('gulp-plumber'),
 rename      = require('gulp-rename'),
 sass        = require('gulp-sass'),
 sourcemaps  = require('gulp-sourcemaps'),
@@ -22,6 +23,47 @@ banner  = '/*!\n'+
 		  ' * <%= pkg.name %>\n'+
 		  ' * Build date: '+ now +'\n'+
 		  ' */\n';
+
+// Hold the name of the last task to run, in case of error
+var taskName;
+
+var handleError = function(err) {
+	var file = err.file;
+	var line = err.line;
+
+	if(typeof err.file === 'undefined') {
+		file = err.fileName;
+	}
+
+	if(typeof err.line === 'undefined') {
+		line = err.lineNumber;
+	}
+
+	var splitErrMessage  = err.message.split("\n"),
+		errMessageLength = splitErrMessage.length,
+		message          =
+			"Error running '" + taskName + "' task." +
+			"\n\t   File: " + file +
+			"\n\t   Line: " + line +
+			"\n\t   Message: " + splitErrMessage[0]
+	;
+
+	// Some errors have a second part
+	if(typeof splitErrMessage[1] !== 'undefined') {
+		message += "\n\t   " + splitErrMessage[1];
+	}
+
+	// Some have even more (missing mixin for example where it'll privide a backtrace)
+	if(errMessageLength > 2) {
+		splitErrMessage.forEach(function(el, i) {
+			if(i > 1) {
+				message += "\n\t\t" + splitErrMessage[i].trim();
+			}
+		});
+	}
+
+	return notify().write(message);
+};
 
 // JS hint task: Runs JSHint using the options in the .jshintrc file
 gulp.task('jshint', function() {
@@ -39,7 +81,11 @@ gulp.task('jshint', function() {
 
 // Scripts task: Concat, minify & generate sourcemaps
 gulp.task('scripts', function() {
+	// this.seq is an array containing the tasks that have run, we want that last one
+	taskName = this.seq.pop();
+
 	gulp.src('js/src/*.js')
+		.pipe(plumber({errorHandler: handleError}))
 		.pipe(sourcemaps.init())
 			.pipe(concat('app.js'))
 			.pipe(header(banner, { pkg: pkg } ))
@@ -70,46 +116,21 @@ gulp.task('plugin-scripts', function() {
 
 // Styles task: Compile Sass, add prefixes and minify
 gulp.task('styles', function() {
+	// this.seq is an array containing the tasks that have run, we want that last one
+	taskName = this.seq.pop();
+
 	gulp.src('css/**/*.scss')
+		.pipe(plumber({errorHandler: handleError}))
 		.pipe(sourcemaps.init())
-			.pipe(sass({
-				outputStyle: 'expanded',
-				errLogToConsole: false,
-				onError: function(err) {
-					var splitErrMessage  = err.message.split("\n"),
-						errMessageLength = splitErrMessage.length,
-						message          =
-							"Error compiling Sass." +
-							"\n\t   File: " + err.file +
-							"\n\t   Line: " + err.line +
-							"\n\t   Message: " + splitErrMessage[0]
-					;
-
-					// Some errors have a second part
-					if(typeof splitErrMessage[1] !== 'undefined') {
-						message += "\n\t   " + splitErrMessage[1]
-					}
-
-					// Some have even more (missing mixin for example where it'll privide a backtrace)
-					if(errMessageLength > 2) {
-						splitErrMessage.forEach(function(el, i) {
-							if(i > 1) {
-								message += "\n\t\t" + splitErrMessage[i].trim();
-							}
-						});
-					}
-
-					return notify().write(message);
-				}
-			}))
+			.pipe(sass({ outputStyle: 'expanded' }))
 			.pipe(autoprefix())
+			.pipe(gulp.dest('style/'))
+			.pipe(rename({ suffix: ".min" })) // Rename the generated CSS file to add the .min suffix
+			.pipe(cssnano())
+			.pipe(header(banner, { pkg: pkg } ))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '.' }))
 		.pipe(gulp.dest('css/'))
 		.pipe(filter('*.css')) // Filter stream so we only get notifications and injections from CSS files, not the maps & so we don't minify the map file
-		.pipe(rename({ suffix: ".min" })) // Rename the generated CSS file to add the .min suffix
-		.pipe(minifycss({ keepSpecialComments: 0 }))
-		.pipe(header(banner, { pkg: pkg } ))
-		.pipe(gulp.dest('css/'))
 		.pipe(reload({ stream: true }))
 		.pipe(notify(function (file) {
 			return 'Styles: ' + file.relative + ' generated.';
@@ -120,7 +141,7 @@ gulp.task('styles', function() {
 gulp.task('plugin-styles', function() {
 	gulp.src('css/plugins/*.css')
 		.pipe(concat('plugins.min.css'))
-		.pipe(minifycss({ keepSpecialComments: 0 }))
+		.pipe(cssnano())
 		.pipe(header(banner, { pkg: pkg } ))
 		.pipe(gulp.dest('css/'))
 		.pipe(reload({ stream: true }))
