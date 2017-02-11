@@ -20,7 +20,6 @@ uglify      = require('gulp-uglify');
 // Set the banner
 var now = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss Z"),
 banner  = '/*!\n'+
-		  ' * <%= pkg.name %>\n'+
 		  ' * Build date: '+ now +'\n'+
 		  ' */\n';
 

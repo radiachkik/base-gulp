@@ -1,14 +1,14 @@
 # My Gulp Set-up
 
-This project is using [Sass][] and [Gulp][].
+This project is using [Sass][], [Gulp][] and [Yarn][].
 
 ## Installation
 
-If you haven't already done so, install [Sass][] and [Gulp][] as they are __required__ for this project.
+If you haven't already done so, install [Sass][] and [Gulp][] as they are __required__ for this project. Package dependencies should be installed with [Yarn][].
 
 Ensure that you have dependencies such as [Node][] installed as well.
 
-Navigate to your project folder in the terminal and run "npm install" which will install the Gulp plugins listed in the package.json and you're ready to go.
+Navigate to your project folder in the terminal and run "yarn" (or "npm install") which will install the Gulp plugins listed in the package.json and you're ready to go.
 
 ## Details
 
@@ -22,11 +22,11 @@ Gulp has been configured to do the following:
 - Concatenate JS files in plugins folder to a single plugins JS file
 - Minify JS
 - Run JSHint
-- Add a banner to the top of the files with the author, version and build date
-- Compress images
+- Add a banner to the top of the generated files with the build date
 - Live updates & remote inspection with BrowserSync
 - Notifications on task completion
 
 [Sass]: http://sass-lang.com/
 [Gulp]: http://gulpjs.com/
 [Node]: http://nodejs.org/
+[Yarn]: https://yarnpkg.com/
