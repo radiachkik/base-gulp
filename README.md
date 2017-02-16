@@ -2,6 +2,8 @@
 
 This project is using [Sass][], [Gulp][] and [Yarn][].
 
+I also have a blog post for a little more info on [this set-up and why I use Gulp](http://williamwalker.me/blog/introducing-gulp.html).
+
 ## Installation
 
 If you haven't already done so, install [Sass][] and [Gulp][] as they are __required__ for this project. Package dependencies should be installed with [Yarn][].

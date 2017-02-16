@@ -1,12 +1,12 @@
 {
 	"name": "Gulp",
-	"version": "2.2.0",
+	"version": "2.2.1",
 	"description": "Gulp and Sass setup",
 	"author": "William Walker <william@williamwalker.me> (http://williamwalker.me/)",
-	"homepage": "https://bitbucket.org/williamium/gulp/overview",
+	"homepage": "https://github.com/williamium/base-gulp",
 	"repository": {
 		"type": "git",
-		"url": "https://williamium@bitbucket.org/williamium/gulp.git"
+		"url": "https://github.com/williamium/base-gulp.git"
 	},
 	"devDependencies": {
 		"browser-sync": "~2.18.x",
