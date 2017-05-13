@@ -1,6 +1,6 @@
 # My Gulp Set-up
 
-This project is using [Sass][], [Gulp][] and [Yarn][].
+This project is using [Sass][] with [Susy][], [Gulp][] and [Yarn][].
 
 I also have a blog post for a little more info on [this set-up and why I use Gulp](http://williamwalker.me/blog/introducing-gulp.html).
 
@@ -29,6 +29,7 @@ Gulp has been configured to do the following:
 - Notifications on task completion
 
 [Sass]: http://sass-lang.com/
+[Susy]: http://susy.oddbird.net/
 [Gulp]: http://gulpjs.com/
 [Node]: http://nodejs.org/
 [Yarn]: https://yarnpkg.com/
