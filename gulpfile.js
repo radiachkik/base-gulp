@@ -94,7 +94,7 @@ gulp.task('scripts', function() {
 			.pipe(header(banner, { pkg: pkg } ))
 		.pipe(sourcemaps.write('maps', { includeContent: false, sourceRoot: '/js/src' }))
 		.pipe(gulp.dest('js/'))
-		.pipe(filter('*.js')) // Filter stream so we only get notifications and reloads from JS files, not the maps
+		.pipe(filter('js/*.js')) // Filter stream so we only get notifications and reloads from JS files, not the maps
 		.pipe(reload({ stream: true }))
 		.pipe(notify(function (file) {
 			return 'Scripts: ' + file.relative + ' generated.';
@@ -129,7 +129,7 @@ gulp.task('styles', function() {
 			.pipe(header(banner, { pkg: pkg } ))
 		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '.' }))
 		.pipe(gulp.dest('css/'))
-		.pipe(filter('*.css')) // Filter stream so we only get notifications and injections from CSS files, not the maps & so we don't minify the map file
+		.pipe(filter('css/*.css')) // Filter stream so we only get notifications and injections from CSS files, not the maps & so we don't minify the map file
 		.pipe(reload({ stream: true }))
 		.pipe(notify(function (file) {
 			return 'Styles: ' + file.relative + ' generated.';
