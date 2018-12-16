@@ -1,17 +1,20 @@
-/* ==========================================================================
-   Sass imports
-   ========================================================================== */
+/*
+ * === Sass Imports ===
+ */
 
-@import "../node_modules/susy/sass/susy";
+// @import "../node_modules/susy/sass/susy";
+@import "../node_modules/normalize.css/normalize.css";
 
+// Helpers
 @import "_helpers/helpers";
 
+// Base
 @import "_base/grid";
-@import "_base/normalize";
 @import "_base/animations";
 @import "_base/typography";
 @import "_base/misc";
 
+// Components
 @import "_components/lists";
 @import "_components/forms";
 @import "_components/tables";
@@ -20,6 +23,8 @@
 @import "_components/sidebar";
 @import "_components/main";
 
+// Browser hacks
 @import "_hacks/shame";
 
+// Responsive/media queries
 @import "_base/respond";

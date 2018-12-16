@@ -1,0 +1,17 @@
+{
+    "extends": ["stylelint-config-standard", "stylelint-config-recommended-scss"],
+    "rules": {
+        "at-rule-empty-line-before": ["always", {
+            "except": ["blockless-after-same-name-blockless"],
+            "ignore": ["after-comment"],
+            "ignoreAtRules": ["if", "else", "return", "include", "warn"]
+        }],
+        "block-closing-brace-newline-after": ["always", {
+            "ignoreAtRules": ["if", "else"]
+        }],
+        "declaration-empty-line-before": "never",
+        "font-family-no-missing-generic-family-keyword": null,
+        "indentation": 4,
+        "max-empty-lines": 2
+    }
+}

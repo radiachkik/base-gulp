@@ -1,0 +1,16 @@
+{
+    "env": {
+        "browser": true
+    },
+    "extends": "airbnb-base",
+    "rules": {
+        "indent": ["error", 4],
+        "arrow-parens": ["error", "as-needed"],
+        "object-curly-newline": ["error", {
+            "ObjectExpression": { "minProperties": 4, "multiline": true, "consistent": true },
+            "ObjectPattern": { "multiline": true },
+            "ImportDeclaration": "never",
+            "ExportDeclaration": { "multiline": true, "minProperties": 3 }
+        }]
+    }
+}

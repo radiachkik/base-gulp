@@ -1,11 +1,2 @@
-# Sublime Text
-.sublime-project
-.sublime-workspace
-
-# SASS
-.sass-cache
-.sass-cache/
-.scssc
-
 # Node
 node_modules/
