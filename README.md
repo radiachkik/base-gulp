@@ -1,35 +1,34 @@
 # My Gulp Set-up
 
-This project is using [Sass][] with [Susy][], [Gulp][] and [Yarn][].
+This project is a default [Gulp][] and [Sass][] configuration that's used as a basis for many projects.
 
 I also have a blog post for a little more info on [this set-up and why I use Gulp](http://williamwalker.me/blog/introducing-gulp.html).
 
 ## Installation
 
-If you haven't already done so, install [Sass][] and [Gulp][] as they are __required__ for this project. Package dependencies should be installed with [Yarn][].
+If you haven't already done so, install [Gulp][] and [Sass][] as they are __required__ for this project.
 
 Ensure that you have dependencies such as [Node][] installed as well.
 
-Navigate to your project folder in the terminal and run "yarn" (or "npm install") which will install the Gulp plugins listed in the package.json and you're ready to go.
+Navigate to your project folder in the terminal and run "npm install" which will install the packages listed in the package.json and you're ready to go.
 
 ## Details
 
 Gulp has been configured to do the following:
 
 - Compile Sass to CSS
-- Auto-prefix CSS (write W3C syntax, vendor prefixes added automagically)
+- Auto-prefix CSS (write W3C syntax, vendor prefixes added automagically based on Browserslist config in package.json)
 - Minify CSS
-- Concatenate CSS files in plugins folder to a single plugins CSS file
 - Concatenate JS files into a single app.js
-- Concatenate JS files in plugins folder to a single plugins JS file
+- Transpile JS with [Babel][] (based on Browserslist config in package.json)
 - Minify JS
-- Run JSHint
-- Add a banner to the top of the generated files with the build date
+- Run ESLint for linting JS
+- Run Stylelint for linting CSS and Sass
+- Generates Sourcemaps for CSS and JS
 - Live updates & remote inspection with BrowserSync
 - Notifications on task completion
 
 [Sass]: http://sass-lang.com/
-[Susy]: http://susy.oddbird.net/
 [Gulp]: http://gulpjs.com/
 [Node]: http://nodejs.org/
-[Yarn]: https://yarnpkg.com/
+[Babel]: https://babeljs.io/

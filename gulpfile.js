@@ -1,171 +1,106 @@
-// Load Gulp and all the plugins
-var pkg     = require('./package.json'),
-browserSync = require('browser-sync'),
-dateFormat  = require('dateformat'),
-reload      = browserSync.reload,
-gulp        = require('gulp'),
-autoprefix  = require('gulp-autoprefixer'),
-concat      = require('gulp-concat'),
-cssnano     = require('gulp-cssnano'),
-filter      = require('gulp-filter'),
-header      = require('gulp-header'),
-jshint      = require('gulp-jshint'),
-notify      = require('gulp-notify'),
-plumber     = require('gulp-plumber'),
-rename      = require('gulp-rename'),
-sass        = require('gulp-sass'),
-sourcemaps  = require('gulp-sourcemaps'),
-uglify      = require('gulp-uglify');
+const { src, dest, watch, series, parallel } = require('gulp');
+const babel = require('gulp-babel');
+const browserSync = require('browser-sync').create();
+const concat = require('gulp-concat');
+const eslint = require('gulp-eslint');
+const filter = require('gulp-filter');
+const gulpIf = require('gulp-if');
+const notify = require('gulp-notify');
+const postcss = require('gulp-postcss');
+const rename = require('gulp-rename');
+const sass = require('gulp-sass');
+const sourcemaps = require('gulp-sourcemaps');
+const stylelint = require('gulp-stylelint');
+// const uglify = require('gulp-uglify');
+const autoprefixer = require('autoprefixer');
+const cssnano = require('cssnano');
+const cssImport = require('postcss-import');
 
-// Set the banner
-var now = dateFormat(new Date(), "yyyy-mm-dd HH:MM:ss Z"),
-banner  = '/*!\n'+
-		  ' * Build date: '+ now +'\n'+
-		  ' */\n';
+function isFixed(file) {
+    return file.eslint != null && file.eslint.fixed;
+}
 
-// Hold the name of the last task to run, in case of error
-var taskName;
+function jsLint() {
+    return src('js/src/*.js')
+        .pipe(eslint({ fix: true }))
+        .pipe(eslint.format())
+        .pipe(gulpIf(isFixed, dest('js/src/')))
+        .pipe(eslint.results(results => {
+            if (results.errorCount > 0) {
+                throw new Error(`ESLint: ${results.length} results, ${results.errorCount} errors, ${results.warningCount} warnings`);
+            }
+        }))
+        .on('error', notify.onError('ESLint: <%= error.message %>'))
+        .pipe(eslint.failAfterError());
+}
 
-var handleError = function(err) {
-	var file = err.file;
-	var line = err.line;
+function javascript() {
+    return src('js/src/*.js')
+        .pipe(sourcemaps.init())
+        .pipe(concat('app.js'))
+        .pipe(babel())
+        // .pipe(uglify())
+        .pipe(rename('app.min.js'))
+        .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '/js/src' }))
+        .pipe(dest('js/'))
+        .pipe(filter('js/*.js')) // Filter stream so we only get notifications from JS files, not the maps
+        .pipe(notify('Scripts: <%= file.relative %> generated.'));
+}
 
-	if(typeof err.file === 'undefined') {
-		file = err.fileName;
-	}
+function cssLint() {
+    return src('css/**/*.scss')
+        .pipe(stylelint({
+            failAfterError: true,
+            reporters: [{ formatter: 'string', console: true }],
+        }));
+}
 
-	if(typeof err.line === 'undefined') {
-		line = err.lineNumber;
-	}
+function css() {
+    return src('css/**/*.scss')
+        .pipe(sourcemaps.init())
+        .pipe(sass({ outputStyle: 'expanded' }))
+        .pipe(postcss([
+            cssImport(),
+            autoprefixer(),
+            cssnano(),
+        ]))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '.' }))
+        .pipe(dest('css/'))
+        .pipe(filter('css/*.css')) // Filter stream so we only get notifications and injections from CSS files, not the maps
+        .pipe(browserSync.stream())
+        .pipe(notify('Styles: <%= file.relative %> generated.'));
+}
 
-	var splitErrMessage  = err.message.split("\n"),
-		errMessageLength = splitErrMessage.length,
-		message          =
-			"Error running '" + taskName + "' task." +
-			"\n\t   File: " + file +
-			"\n\t   Line: " + line +
-			"\n\t   Message: " + splitErrMessage[0]
-	;
+function sync(done) {
+    // Dynamic proxy configuration
+    // browserSync.init({
+    //     proxy: 'local.domain.com',
+    // });
 
-	// Some errors have a second part
-	if(typeof splitErrMessage[1] !== 'undefined') {
-		message += "\n\t   " + splitErrMessage[1];
-	}
+    // Static configuration
+    // browserSync.init({
+    //     server: {
+    //         baseDir: './',
+    //     },
+    // });
 
-	// Some have even more (missing mixin for example where it'll privide a backtrace)
-	if(errMessageLength > 2) {
-		splitErrMessage.forEach(function(el, i) {
-			if(i > 1) {
-				message += "\n\t\t" + splitErrMessage[i].trim();
-			}
-		});
-	}
+    done();
+}
 
-	return notify().write(message);
-};
+function reload(done) {
+    browserSync.reload();
 
-// JS hint task: Runs JSHint using the options in the .jshintrc file
-gulp.task('jshint', function() {
-	gulp.src('js/src/*.js')
-		.pipe(jshint('.jshintrc'))
-		.pipe(jshint.reporter('jshint-stylish'))
-		.pipe(notify(function (file) {
-			if (file.jshint.success) {
-				return 'JSHint: ' + file.relative + ' (complete).';
-			} else {
-				return 'JSHint: ' + file.relative + ' (' + file.jshint.results.length + ' errors).';
-			}
-		}));
-});
+    done();
+}
 
-// Scripts task: Concat, minify & generate sourcemaps
-gulp.task('scripts', function() {
-	// this.seq is an array containing the tasks that have run, we want that last one
-	taskName = this.seq.pop();
+function watcher() {
+    watch('js/src/*.js', series(jsLint, javascript, reload));
+    watch('css/**/*.scss', series(cssLint, css));
+}
 
-	gulp.src('js/src/*.js')
-		.pipe(plumber({errorHandler: handleError}))
-		.pipe(sourcemaps.init())
-			.pipe(concat('app.js'))
-			.pipe(header(banner, { pkg: pkg } ))
-			.pipe(gulp.dest('js/'))
-			.pipe(rename('app.min.js'))
-			.pipe(uglify())
-			.pipe(header(banner, { pkg: pkg } ))
-		.pipe(sourcemaps.write('maps', { includeContent: false, sourceRoot: '/js/src' }))
-		.pipe(gulp.dest('js/'))
-		.pipe(filter('js/*.js')) // Filter stream so we only get notifications and reloads from JS files, not the maps
-		.pipe(reload({ stream: true }))
-		.pipe(notify(function (file) {
-			return 'Scripts: ' + file.relative + ' generated.';
-		}));
-});
-
-// Plugin scripts task: Concat JS files for plugins
-gulp.task('plugin-scripts', function() {
-	gulp.src('js/plugins/*.js')
-		.pipe(concat('plugins.min.js'))
-		.pipe(header(banner, { pkg: pkg } ))
-		.pipe(gulp.dest('js/'))
-		.pipe(reload({ stream: true }))
-		.pipe(notify(function (file) {
-			return 'Scripts: ' + file.relative + ' generated.';
-		}));
-});
-
-// Styles task: Compile Sass, add prefixes and minify
-gulp.task('styles', function() {
-	// this.seq is an array containing the tasks that have run, we want that last one
-	taskName = this.seq.pop();
-
-	gulp.src('css/**/*.scss')
-		.pipe(plumber({errorHandler: handleError}))
-		.pipe(sourcemaps.init())
-			.pipe(sass({ outputStyle: 'expanded' }))
-			.pipe(autoprefix())
-			.pipe(gulp.dest('css/'))
-			.pipe(rename({ suffix: ".min" })) // Rename the generated CSS file to add the .min suffix
-			.pipe(cssnano())
-			.pipe(header(banner, { pkg: pkg } ))
-		.pipe(sourcemaps.write('.', { includeContent: false, sourceRoot: '.' }))
-		.pipe(gulp.dest('css/'))
-		.pipe(filter('css/*.css')) // Filter stream so we only get notifications and injections from CSS files, not the maps & so we don't minify the map file
-		.pipe(reload({ stream: true }))
-		.pipe(notify(function (file) {
-			return 'Styles: ' + file.relative + ' generated.';
-		}));
-});
-
-// Plugin styles task: concatenates & minifies CSS files for plugins
-gulp.task('plugin-styles', function() {
-	gulp.src('css/plugins/*.css')
-		.pipe(concat('plugins.min.css'))
-		.pipe(cssnano())
-		.pipe(header(banner, { pkg: pkg } ))
-		.pipe(gulp.dest('css/'))
-		.pipe(reload({ stream: true }))
-		.pipe(notify(function (file) {
-			return 'Styles: ' + file.relative + ' generated.';
-		}));
-});
-
-// Configure and start BrowserSync
-gulp.task('browser-sync', function() {
-	browserSync({
-		proxy: "local.domain.com"
-	});
-});
-
-// Standard watch task
-gulp.task('watch', function() {
-	gulp.watch('js/src/*.js', ['jshint', 'scripts']);
-	gulp.watch('js/plugins/*.js', ['plugin-scripts']);
-	gulp.watch('css/**/*.scss', ['styles']);
-	gulp.watch('css/plugins/*.css', ['plugin-styles']);
-});
-
-// Start BrowserSync and watches for changes
-gulp.task('watch-and-sync', ['browser-sync', 'watch']);
-
-// Default task: runs tasks immediately and continues watching for changes
-gulp.task('default', ['jshint', 'scripts', 'plugin-scripts', 'styles', 'plugin-styles', 'watch']);
+exports.default = parallel(series(jsLint, javascript), series(cssLint, css));
+exports.watch = watcher;
+exports.css = series(cssLint, css);
+exports.js = series(jsLint, javascript);
+exports.sync = series(sync, watcher);
